@@ -20,14 +20,28 @@ jobs:
             - name: Build
               run: go build -o main *.go
 
-            - name: create id_rsa
-              run: |
-                echo "${{secrets.ID_RSA}}" > id_rsa
-                chmod 0600 id_rsa
-                pwd
+            # - name: create id_rsa
+            #   run: |
+            #     cd deploy
+            #     echo "${{secrets.ID_RSA}}" > id_rsa
+            #     chmod 0600 id_rsa
 
             - name: create config.json
               run: ./init -cookie="${{secrets.COOKIE}}" -ws-protocol="${{secrets.SEC_WEBSOCKET_PROTOCOL}}" -mastodon-token="${{secrets.MASTODON_TOKEN}}" -telegraph-token="${{secrets.TELEGRAPH_TOEKN}}" && pwd
             
-            - name: scp
-              run: pwd && scp -i ./id_rsa main config.json pm2.config.js root@${{secrets.SERVER_IP}}:/root/mastodon/
+            - name: remove into a directory
+              run: mv ./main  ./deploy
+
+            - name: deploy
+              uses: garygrossgarten/github-action-scp@release
+              with:
+                local: deploy
+                remote: /root/mastodon/
+                # 涉及偏安全隐私的信息，不要明文暴露在此文件中，因为repo很可能是公开的，会被所有人看见
+                # ${{ ... }} 会应用你在对应项目设置中，配置的对应serets的键值信息，从而保护私密信息不被看到
+                host: ${{ secrets.SERVER_IP }}
+                username: root
+                privateKey: ${{ secrets.ID_RSA }}
+
+            # - name: scp
+              # run: pwd && scp -i ./id_rsa main config.json pm2.config.js root@${{secrets.SERVER_IP}}:/root/mastodon/
