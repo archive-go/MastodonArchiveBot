@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            script: './mastodonarchivebot',
+            script: './main',
             watch: '.',
             instances: 1,
             ignore_watch: ['logs'],
