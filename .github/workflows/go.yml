@@ -18,7 +18,8 @@ jobs:
               uses: actions/checkout@v1
 
             - name: Build
-              run: go build -o main *.go
+              run: |
+                go build -o deploy/main *.go
 
             # - name: create id_rsa
             #   run: |
@@ -27,11 +28,8 @@ jobs:
             #     chmod 0600 id_rsa
 
             - name: create config.json
-              run: ./init -cookie="${{secrets.COOKIE}}" -ws-protocol="${{secrets.SEC_WEBSOCKET_PROTOCOL}}" -mastodon-token="${{secrets.MASTODON_TOKEN}}" -telegraph-token="${{secrets.TELEGRAPH_TOEKN}}" && pwd
+              run: ./deploy/init -cookie="${{secrets.COOKIE}}" -ws-protocol="${{secrets.SEC_WEBSOCKET_PROTOCOL}}" -mastodon-token="${{secrets.MASTODON_TOKEN}}" -telegraph-token="${{secrets.TELEGRAPH_TOEKN}}" && pwd
             
-            - name: remove into a directory
-              run: mv ./main  ./deploy
-
             - name: deploy
               uses: garygrossgarten/github-action-scp@release
               with:
