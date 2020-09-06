@@ -24,20 +24,12 @@ jobs:
             - name: create config.json
               run: ./deploy/init -cookie="${{secrets.COOKIE}}" -ws-protocol="${{secrets.SEC_WEBSOCKET_PROTOCOL}}" -mastodon-token="${{secrets.MASTODON_TOKEN}}" -telegraph-token="${{secrets.TELEGRAPH_TOEKN}}" && pwd
             
-            # - name: deploy
-            #   uses: garygrossgarten/github-action-scp@release
-            #   with:
-            #     local: deploy
-            #     remote: /root/mastodon/
-            #     host: ${{ secrets.SERVER_IP }}
-            #     username: root
-            #     password: ${{secrets.SERVER_PASSWORD}}
-            #     # privateKey: ${{ secrets.ID_RSA }}
-            uses: horochx/deploy-via-scp@master
-            with:
-              local: deploy # eg: dist
-              remote: /root/mastodon # eg: /home/github-action
-              host: ${{ secrets.SERVER_IP }} # eg: example.com
-              port: 22 # eg: 22
-              user: root # eg: github-action
-              key: ${{ secrets.ID_RSA }} # 
+            - name: deploy
+              uses: horochx/deploy-via-scp@master
+              with:
+                local: deploy # eg: dist
+                remote: /root/mastodon # eg: /home/github-action
+                host: ${{ secrets.SERVER_IP }} # eg: example.com
+                port: 22 # eg: 22
+                user: root # eg: github-action
+                key: ${{ secrets.ID_RSA }} # 
