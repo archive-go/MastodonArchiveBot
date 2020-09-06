@@ -31,4 +31,5 @@ jobs:
                 remote: /root/mastodon/
                 host: ${{ secrets.SERVER_IP }}
                 username: root
-                privateKey: ${{ secrets.ID_RSA }}
+                password: ${{secrets.SERVER_PASSWORD}}
+                # privateKey: ${{ secrets.ID_RSA }}
