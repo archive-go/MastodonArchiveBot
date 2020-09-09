@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
-	"regexp"
+	"strings"
 
 	"github.com/MakeGolangGreat/archive-go"
 	"github.com/MakeGolangGreat/mastodon-go"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/fatih/color"
 	"github.com/gorilla/websocket"
 )
@@ -18,7 +20,7 @@ import (
 var cookie string
 var mastodonToken string
 var telegraphToken string
-var secWebSocketProtocol string
+var domain string
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -30,21 +32,21 @@ func main() {
 }
 
 func listen() {
-	addr := "wss://alive.bar/api/v1/streaming/?stream=public:local"
+	addr := "wss://" + domain + "/api/v1/streaming/?stream=public:local"
 
 	header := http.Header{}
 	header.Add("Cookie", cookie)
-	header.Add("Host", "alive.bar")
-	header.Add("Origin", "https://alive.bar")
-	header.Add("Sec-WebSocket-Protocol", secWebSocketProtocol)
+	header.Add("Host", domain)
+	header.Add("Origin", "https://"+domain)
 
 	ws, _, err := websocket.DefaultDialer.Dial(addr, header)
 	if err != nil {
-		log.Fatal("dial:", err)
+		log.Fatal("dial:", err.Error())
 	}
 	defer ws.Close()
 	exitHandler()
 
+	fmt.Println("连接上WS，持续监听")
 	for {
 		_, body, err := ws.ReadMessage()
 		if err != nil {
@@ -62,60 +64,73 @@ func listen() {
 			var status mastodon.Status
 			err := json.Unmarshal([]byte(message.Payload.(string)), &status)
 			if err != nil {
-				fmt.Println("err", err)
+				fmt.Println("err", err.Error())
 			}
 			// 不监测自己的发嘟
 			if status.Account.UserName == "beifen" {
 				continue
 			}
 
-			linkRegExp := regexp.MustCompile(`href="(http.*?)"`)
-
-			// 如果监测到链接存在，交给archive-go备份
-			if linkRegExp.MatchString(status.Content) {
-				matchURL := linkRegExp.FindAllSubmatch([]byte(status.Content), -1)
-
-				var totalURL string
-				for _, url := range matchURL {
-					link := string(url[1])
-
-					archivelink, saveError := archive.Save(link, telegraphToken, attachInfo)
-					if saveError != nil {
-						fmt.Println("文章保存出错：", saveError.Error())
-					} else {
-						totalURL += archivelink + "\n"
-					}
-				}
-
-				fmt.Printf("备份链接：%s，长度%d\n", totalURL, len(totalURL))
-
-				if len(totalURL) == 0 {
-					fmt.Println("无备份链接生成（可能是出错，也可能是链接都已经备份过）")
-					continue
-				}
-
-				reply := fmt.Sprintf("监测到链接存在...\n\n备份链接内容到 Telegraph 成功...\n\n输出链接：\n%s\n\n#备份\n\n本Bot代码开源：%s", totalURL, projectLink)
-
-				toot := &mastodon.Mastodon{
-					Token:  mastodonToken,
-					Domain: "https://alive.bar",
-				}
-				result, err := toot.SendStatuses(&mastodon.StatusParams{
-					Status:      reply,
-					MediaIds:    "[]",
-					Poll:        "[]",
-					Visibility:  "public",
-					InReplyToID: status.ID,
-					Sensitive:   true,
-					SpoilerText: "自动备份",
-				})
-				if err != nil {
-					color.Red(err.Error())
-					continue
-				}
-
-				fmt.Printf("回嘟成功，ID：%s\n", result.ID)
+			doc, err := goquery.NewDocumentFromReader(strings.NewReader(status.Content))
+			if err != nil {
+				fmt.Println("goquery 解析HTML字符串失败：", err.Error())
 			}
+
+			var totalURL string
+			doc.Find("a").Each(func(_ int, s *goquery.Selection) {
+				href, exists := s.Attr("href")
+				if !exists {
+					return
+				}
+
+				url, err := url.Parse(href)
+				if err != nil {
+					fmt.Println("解析URL失败", err.Error())
+					return
+				}
+				fmt.Println(url.Host)
+				if url.Host == domain {
+					// 如果链接是当前实例的，那么不会将其备份
+					return
+				}
+
+				// 如果监测到链接存在，交给archive-go备份
+				archivelink, saveError := archive.Save(href, telegraphToken, attachInfo)
+				if saveError != nil {
+					fmt.Println("文章保存出错：", saveError.Error())
+				} else {
+					totalURL += archivelink + "\n"
+				}
+			})
+
+			fmt.Printf("备份链接：%s，长度%d\n", totalURL, len(totalURL))
+
+			if len(totalURL) == 0 {
+				fmt.Println("无备份链接生成（可能是出错，也可能是链接都已经备份过）")
+				continue
+			}
+
+			reply := fmt.Sprintf("监测到链接存在...\n\n备份链接内容到 Telegraph 成功...\n\n输出链接：\n%s\n\n#备份\n\n本Bot代码开源：%s", totalURL, projectLink)
+
+			toot := &mastodon.Mastodon{
+				Token:  mastodonToken,
+				Domain: "https://" + domain,
+			}
+			result, err := toot.SendStatuses(&mastodon.StatusParams{
+				Status:      reply,
+				MediaIds:    "[]",
+				Poll:        "[]",
+				Visibility:  "public",
+				InReplyToID: status.ID,
+				Sensitive:   true,
+				SpoilerText: "自动备份",
+			})
+			if err != nil {
+				color.Red(err.Error())
+				continue
+			}
+
+			fmt.Printf("回嘟成功，ID：%s\n", result.ID)
 		}
 	}
 }
@@ -148,7 +163,7 @@ func readConfig() {
 	errHandler("解码配置失败", err2)
 
 	cookie = conf.Cookie
-	secWebSocketProtocol = conf.SecWebSocketProtocol
+	domain = conf.Domain
 	mastodonToken = conf.MastodonToken
 	telegraphToken = conf.TelegraphToken
 	color.Green("读取配置成功")

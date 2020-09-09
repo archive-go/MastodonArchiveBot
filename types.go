@@ -3,7 +3,7 @@ package main
 type (
 	config struct {
 		Cookie               string
-		SecWebSocketProtocol string
+		Domain string
 		MastodonToken        string
 		TelegraphToken       string
 	}

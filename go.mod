@@ -6,6 +6,7 @@ require (
 	github.com/MakeGolangGreat/archive-go v1.0.2
 	github.com/MakeGolangGreat/mastodon-go v1.0.0
 	github.com/MakeGolangGreat/telegraph-go v1.1.0
+	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/antchfx/xmlquery v1.3.0 // indirect
 	github.com/fatih/color v1.9.0

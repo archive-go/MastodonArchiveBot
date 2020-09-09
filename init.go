@@ -12,22 +12,20 @@ import (
 // ./init -cookie="123" -ws-protocol="456" -mastodon-token="789" -telegraph-token="101112"
 func createConfig() {
 	cookieFlag := flag.String("cookie", "", "长毛象 WebSocket 请求的 Cookie 数据")
-	secWebSocketProtocolFlag := flag.String("ws-protocol", "", "WebSocket 请求的 SecWebSocketProtocol Header，自行从请求详情中拿")
 	mastodonTokenFlag := flag.String("mastodon-token", "", "mastodon token")
 	telegraphTokenFlag := flag.String("telegraph-token", "", "telegraph token")
 	flag.Parse()
 
-	color.White("Cookie:%s\nSecWebSocketProtocol:%s\nMastodonToken:%s\nTelegraphToken:%s", *cookieFlag, *secWebSocketProtocolFlag, *mastodonTokenFlag, *telegraphTokenFlag)
+	color.White("Cookie:%s\nMastodonToken:%s\nTelegraphToken:%s", *cookieFlag, *mastodonTokenFlag, *telegraphTokenFlag)
 
 	file, err := os.OpenFile("./config.json", os.O_RDWR|os.O_CREATE, 0766) //打开或创建文件，设置默认权限
 	errHandler("读取配置失败", err)
 	defer file.Close()
 
 	configData := config{
-		Cookie:               *cookieFlag,
-		SecWebSocketProtocol: *secWebSocketProtocolFlag,
-		MastodonToken:        *mastodonTokenFlag,
-		TelegraphToken:       *telegraphTokenFlag,
+		Cookie:         *cookieFlag,
+		MastodonToken:  *mastodonTokenFlag,
+		TelegraphToken: *telegraphTokenFlag,
 	}
 	configJSON, err := json.Marshal(configData)
 	if err != nil {
