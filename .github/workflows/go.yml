@@ -22,7 +22,7 @@ jobs:
                   go build -o mastodon/main *.go
 
             - name: create config.json
-              run: ./mastodon/init -cookie="${{secrets.COOKIE}}" -ws-protocol="${{secrets.SEC_WEBSOCKET_PROTOCOL}}" -mastodon-token="${{secrets.MASTODON_TOKEN}}" -telegraph-token="${{secrets.TELEGRAPH_TOEKN}}" && mv config.json ./mastodon/
+              run: ./mastodon/init -cookie="${{secrets.COOKIE}}" -domain="${{secrets.DOMAIN}}" -mastodon-token="${{secrets.MASTODON_TOKEN}}" -telegraph-token="${{secrets.TELEGRAPH_TOEKN}}"
 
             - name: deploy to remote server
               uses: garygrossgarten/github-action-scp@release

@@ -8,17 +8,18 @@ import (
 	"github.com/fatih/color"
 )
 
-// 交叉编译：CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o init *.go
-// ./init -cookie="123" -ws-protocol="456" -mastodon-token="789" -telegraph-token="101112"
+// 交叉编译：CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o mastodon/init init *.go
+// ./init -cookie="123" -domain="123123" -mastodon-token="789" -telegraph-token="101112"
 func createConfig() {
 	cookieFlag := flag.String("cookie", "", "长毛象 WebSocket 请求的 Cookie 数据")
 	mastodonTokenFlag := flag.String("mastodon-token", "", "mastodon token")
 	telegraphTokenFlag := flag.String("telegraph-token", "", "telegraph token")
+	domainFlag := flag.String("domain", "", "domain")
 	flag.Parse()
 
 	color.White("Cookie:%s\nMastodonToken:%s\nTelegraphToken:%s", *cookieFlag, *mastodonTokenFlag, *telegraphTokenFlag)
 
-	file, err := os.OpenFile("./config.json", os.O_RDWR|os.O_CREATE, 0766) //打开或创建文件，设置默认权限
+	file, err := os.OpenFile("./mastodon/config.json", os.O_RDWR|os.O_CREATE, 0766) //打开或创建文件，设置默认权限
 	errHandler("读取配置失败", err)
 	defer file.Close()
 
@@ -26,6 +27,7 @@ func createConfig() {
 		Cookie:         *cookieFlag,
 		MastodonToken:  *mastodonTokenFlag,
 		TelegraphToken: *telegraphTokenFlag,
+		Domain: *domainFlag,
 	}
 	configJSON, err := json.Marshal(configData)
 	if err != nil {

@@ -29,6 +29,7 @@ func init() {
 func main() {
 	readConfig()
 	listen()
+	// createConfig()
 }
 
 func listen() {
