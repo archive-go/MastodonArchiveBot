@@ -96,7 +96,9 @@ func listen() {
 				}
 
 				// 如果监测到链接存在，交给archive-go备份
-				archivelink, saveError := archive.Save(href, telegraphToken, attachInfo)
+				archivelink, saveError := archive.Save(href, telegraphToken, attachInfo, &archive.More{
+					IncludeAll: false,
+				})
 				if saveError != nil {
 					fmt.Println("文章保存出错：", saveError.Error())
 				} else {
@@ -107,7 +109,7 @@ func listen() {
 			fmt.Printf("备份链接：%s，长度%d\n", totalURL, len(totalURL))
 
 			if len(totalURL) == 0 {
-				fmt.Println("无备份链接生成（可能是出错，也可能是链接都已经备份过）")
+				fmt.Println("无备份链接生成（可能是出错，也可能是链接都已经备份过）或者当前嘟文没有检测到链接存在）")
 				continue
 			}
 

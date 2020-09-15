@@ -18,6 +18,8 @@ github.com/antchfx/xmlquery v1.2.4 h1:T/SH1bYdzdjTMoz2RgsfVKbM5uWh3gjDYYepFqQmFv
 github.com/antchfx/xmlquery v1.2.4/go.mod h1:KQQuESaxSlqugE2ZBcM/qn+ebIpt+d+4Xx7YcSGAIrM=
 github.com/antchfx/xmlquery v1.3.0 h1:YvWny6c+VzYrTBMw9aopGqO3BfTUW6MHRAnHW2kYoQ0=
 github.com/antchfx/xmlquery v1.3.0/go.mod h1:64w0Xesg2sTaawIdNqMB+7qaW/bSqkQm+ssPaCMWNnc=
+github.com/antchfx/xmlquery v1.3.1 h1:nIKWdtnhrXtj0/IRUAAw2I7TfpHUa3zMnHvNmPXFg+w=
+github.com/antchfx/xmlquery v1.3.1/go.mod h1:64w0Xesg2sTaawIdNqMB+7qaW/bSqkQm+ssPaCMWNnc=
 github.com/antchfx/xpath v1.1.6 h1:6sVh6hB5T6phw1pFpHRQ+C4bd8sNI+O58flqtg7h0R0=
 github.com/antchfx/xpath v1.1.6/go.mod h1:Yee4kTMuNiPYJ7nSNorELQMr1J33uOpXDMByNYhvtNk=
 github.com/antchfx/xpath v1.1.10 h1:cJ0pOvEdN/WvYXxvRrzQH9x5QWKpzHacYO8qzCcDYAg=
@@ -126,6 +128,8 @@ golang.org/x/sys v0.0.0-20200828194041-157a740278f4 h1:kCCpuwSAoYJPkNc6x0xT9yTtV
 golang.org/x/sys v0.0.0-20200828194041-157a740278f4/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200905004654-be1d3432aa8f h1:Fqb3ao1hUmOR3GkUOg/Y+BadLwykBIzs5q8Ez2SbHyc=
 golang.org/x/sys v0.0.0-20200905004654-be1d3432aa8f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20200909081042-eff7692f9009 h1:W0lCpv29Hv0UaM1LXb9QlBHLNP8UFfcKjblhVCWftOM=
+golang.org/x/sys v0.0.0-20200909081042-eff7692f9009/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2 h1:tW2bmiBqwgJj/UpqtC8EpXEZVYOwU0yG4iWbprSVAcs=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
