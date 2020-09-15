@@ -171,3 +171,18 @@ func readConfig() {
 	telegraphToken = conf.TelegraphToken
 	color.Green("读取配置成功")
 }
+
+// 检测是否链接中包含一些敏感参数
+// 比如微信公众号的链接包含了 sharer_shareid 参数
+func leakSecretInfo(link string) (bool, string) {
+	if url, err := url.Parse(link); err != nil {
+		host := url.Hostname()
+		q := url.Query()
+		if host == "mp.weixin.qq.com" {
+			return q.Get("sharer_shareid") != "", "警告⚠️微信文章链接中包含 ‘sharer_shareid’ 这样的隐私参数，它看上去可以追查到文章分享者。"
+		} else if host == "music.163.com" {
+			return q.Get("userid") != "", "警告⚠️网易云音乐链接中包含 ‘userid’参数，它可以非常容易地被用来反查到特定的用户。"
+		}
+	}
+	return false, ""
+}
