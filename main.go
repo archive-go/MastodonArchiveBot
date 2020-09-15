@@ -30,6 +30,7 @@ func main() {
 	readConfig()
 	listen()
 	// createConfig()
+	fmt.Println("v1.0.0")
 }
 
 func listen() {
@@ -89,10 +90,31 @@ func listen() {
 					fmt.Println("解析URL失败", err.Error())
 					return
 				}
-				fmt.Println(url.Host)
 				if url.Host == domain {
 					// 如果链接是当前实例的，那么不会将其备份
 					return
+				}
+
+				// 监测到链接中包含参数，私信提醒
+				if hasLeak, msg := leakSecretInfo(href); hasLeak {
+					go func(username string, _msg string) {
+						toot := &mastodon.Mastodon{
+							Token:  mastodonToken,
+							Domain: "https://" + domain,
+						}
+						reminderResult, reminderErr := toot.SendStatuses(&mastodon.StatusParams{
+							Status:      "@" + username + "\n\n" + _msg + " \n\n如果我以后不想收到此类提醒消息怎么办？\n好办，直接 Block 本Bot即可",
+							MediaIds:    "[]",
+							Poll:        "[]",
+							Visibility:  "direct",
+							InReplyToID: status.ID,
+							Sensitive:   false,
+						})
+						if reminderErr != nil {
+							color.Red(reminderErr.Error())
+						}
+						fmt.Println("私信成功", reminderResult.ID)
+					}(status.Account.UserName, msg)
 				}
 
 				// 如果监测到链接存在，交给archive-go备份
@@ -107,7 +129,6 @@ func listen() {
 			})
 
 			fmt.Printf("备份链接：%s，长度%d\n", totalURL, len(totalURL))
-
 			if len(totalURL) == 0 {
 				fmt.Println("无备份链接生成（可能是出错，也可能是链接都已经备份过）或者当前嘟文没有检测到链接存在）")
 				continue
@@ -175,13 +196,13 @@ func readConfig() {
 // 检测是否链接中包含一些敏感参数
 // 比如微信公众号的链接包含了 sharer_shareid 参数
 func leakSecretInfo(link string) (bool, string) {
-	if url, err := url.Parse(link); err != nil {
-		host := url.Hostname()
+	if url, err := url.Parse(link); err == nil {
+		host := url.Host
 		q := url.Query()
 		if host == "mp.weixin.qq.com" {
-			return q.Get("sharer_shareid") != "", "警告⚠️微信文章链接中包含 ‘sharer_shareid’ 这样的隐私参数，它看上去可以追查到文章分享者。"
+			return q.Get("sharer_shareid") != "", "警告⚠️你的上条嘟文的微信文章链接中包含 ‘sharer_shareid’ 这样的隐私参数，利用它可以追查到文章的第一位分享者。"
 		} else if host == "music.163.com" {
-			return q.Get("userid") != "", "警告⚠️网易云音乐链接中包含 ‘userid’参数，它可以非常容易地被用来反查到特定的用户。"
+			return q.Get("userid") != "", "警告⚠️你的上条嘟文的网易云音乐链接中包含 ‘userid’参数，它可以非常容易地被用来反查到特定的用户。"
 		}
 	}
 	return false, ""
