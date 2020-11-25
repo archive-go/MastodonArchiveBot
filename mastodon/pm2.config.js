@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            script: './main',
+            script: './bot',
             watch: '.',
             instances: 1,
             ignore_watch: ['logs'],

@@ -106,10 +106,7 @@ func listen() {
 				}
 			})
 
-			fmt.Printf("备份链接：%s，长度%d\n", totalURL, len(totalURL))
-
 			if len(totalURL) == 0 {
-				fmt.Println("无备份链接生成（可能是出错，也可能是链接都已经备份过）或者当前嘟文没有检测到链接存在）")
 				continue
 			}
 

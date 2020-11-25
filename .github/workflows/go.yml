@@ -8,10 +8,10 @@ jobs:
         name: Build
         runs-on: ubuntu-latest
         steps:
-            - name: Set up Go 1.14
+            - name: Set up Go 1.15
               uses: actions/setup-go@v1
               with:
-                  go-version: 1.14
+                  go-version: 1.15
               id: go
 
             - name: Check out source code
@@ -19,16 +19,14 @@ jobs:
 
             - name: Build
               run: |
-                  go build -o mastodon/main *.go
+                  go build -o mastodon/bot *.go
 
-            - name: create config.json
-              run: ./mastodon/init -cookie="${{secrets.COOKIE}}" -domain="${{secrets.DOMAIN}}" -mastodon-token="${{secrets.MASTODON_TOKEN}}" -telegraph-token="${{secrets.TELEGRAPH_TOEKN}}"
-
-            - name: deploy to remote server
+            - name: deploy
               uses: garygrossgarten/github-action-scp@release
               with:
                   local: mastodon
-                  remote: /root/mastodon/
-                  host: ${{ secrets.SERVER_IP }}
-                  username: root
-                  privateKey: ${{ secrets.ID_RSA }}
+                  remote: { { secrets.REMOTE } }
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  aatomicPut: true

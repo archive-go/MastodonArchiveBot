@@ -2,6 +2,8 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/MakeGolangGreat/archive-go v1.0.2 h1:nvzCnswg5cMYaLfoWhf/hAC1VAAbq1x7EyQG2QHT2Do=
 github.com/MakeGolangGreat/archive-go v1.0.2/go.mod h1:HDJVuTrGzSHu27UlGmUJLmm2QkRmbRKGxlNJDKpQs8I=
+github.com/MakeGolangGreat/archive-go v1.0.3 h1:bHRyMZogoz8mVr6jOnNXV9mmSSgYUD4ghlcuF8TO+fo=
+github.com/MakeGolangGreat/archive-go v1.0.3/go.mod h1:HDJVuTrGzSHu27UlGmUJLmm2QkRmbRKGxlNJDKpQs8I=
 github.com/MakeGolangGreat/mastodon-go v1.0.0 h1:iqwbPm8vwX4jtiodj8rX1w/LS+FOlzRYQD8DmcMxtGA=
 github.com/MakeGolangGreat/mastodon-go v1.0.0/go.mod h1:NoygncvSt0EqxV1GFXS8DqjIiGpio34kUPYVPbNDB6Q=
 github.com/MakeGolangGreat/telegraph-go v1.1.0 h1:8CHGf/sCZ3nvK6FX2Wa+kK6qRhsUgcmTWl7I7CW78Zk=
