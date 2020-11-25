@@ -25,7 +25,7 @@ jobs:
               uses: garygrossgarten/github-action-scp@release
               with:
                   local: mastodon
-                  remote: { { secrets.REMOTE } }
+                  remote: ${{ secrets.REMOTE }}
                   host: ${{ secrets.HOST }}
                   username: ${{ secrets.USERNAME }}
                   password: ${{ secrets.PASSWORD }}
