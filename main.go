@@ -4,49 +4,37 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 
 	"github.com/MakeGolangGreat/archive-go"
 	"github.com/MakeGolangGreat/mastodon-go"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/ansel1/merry"
 	"github.com/fatih/color"
 	"github.com/gorilla/websocket"
 )
 
-var cookie string
 var mastodonToken string
 var telegraphToken string
 var domain string
 
-func init() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
-
 func main() {
 	readConfig()
 	listen()
-	// createConfig()
-	fmt.Println("v1.0.0")
 }
 
 func listen() {
 	addr := "wss://" + domain + "/api/v1/streaming/?stream=public:local"
-
-	header := http.Header{}
-	header.Add("Cookie", cookie)
-	header.Add("Host", domain)
-	header.Add("Origin", "https://"+domain)
-
-	ws, _, err := websocket.DefaultDialer.Dial(addr, header)
-	if err != nil {
-		log.Fatal("dial:", err.Error())
-	}
+	ws, res, err := websocket.DefaultDialer.Dial(addr, nil)
 	defer ws.Close()
-	exitHandler()
+	if err != nil {
+		fmt.Println(res)
+		merry.Wrap(err)
+	}
 
 	fmt.Println("连接上WS，持续监听")
 	for {
@@ -167,24 +155,16 @@ func exitHandler() {
 	}()
 }
 
-func errHandler(msg string, err error) {
-	if err != nil {
-		fmt.Printf("%s - %s\n", msg, err)
-		os.Exit(1)
-	}
-}
-
 // 从配置中读取配置
 func readConfig() {
 	file, err := os.OpenFile("./config.json", os.O_RDWR|os.O_CREATE, 0766) //打开或创建文件，设置默认权限
-	errHandler("读取配置失败", err)
+	merry.Wrap(err)
 	defer file.Close()
 
 	var conf config
-	err2 := json.NewDecoder(file).Decode(&conf)
-	errHandler("解码配置失败", err2)
+	err = json.NewDecoder(file).Decode(&conf)
+	merry.Wrap(err)
 
-	cookie = conf.Cookie
 	domain = conf.Domain
 	mastodonToken = conf.MastodonToken
 	telegraphToken = conf.TelegraphToken
@@ -198,9 +178,9 @@ func leakSecretInfo(link string) (bool, string) {
 		host := url.Host
 		q := url.Query()
 		if host == "mp.weixin.qq.com" {
-			return q.Get("sharer_shareid") != "", "警告⚠️你的上条嘟文的微信文章链接中包含 ‘sharer_shareid’ 这样的隐私参数，利用它可以追查到文章的第一位分享者。"
-		} else if host == "music.163.com" {
-			return q.Get("userid") != "", "警告⚠️你的上条嘟文的网易云音乐链接中包含 ‘userid’参数，它可以非常容易地被用来反查到特定的用户。"
+			return q.Get("sharer_shareid") != "", "警告⚠️你的上条嘟文的微信文章链接中包含 ‘sharer_shareid’ 这样的隐私参数，利用它可以追查到文章的第一位分享者。建议分享“永久短链接”（公众号文章右上角三点-复制链接）。如果您不在乎，请忽略本消息。"
+		} else if match, err := regexp.MatchString(".*music.163.com$", host); err == nil && match {
+			return q.Get("userid") != "", "警告⚠️你的上条嘟文的网易云音乐链接中包含 ‘userid’参数，利用它可以反查到第一位分享者。建议手动删除该参数。如果您不在乎，请忽略本消息。"
 		}
 	}
 	return false, ""
