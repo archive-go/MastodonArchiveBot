@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            script: './bot',
+            script: 'chmod +rwx ./bot && ./bot',
             watch: '.',
             instances: 1,
             ignore_watch: ['logs'],
